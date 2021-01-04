@@ -207,53 +207,55 @@ function setPreset(presetButton) {
 
         let positions = []
 
-        positions.push({col:fromTop, row:fromLeft})
-        positions.push({col:fromTop, row:fromLeft+1})
-        positions.push({col:fromTop, row:fromLeft+2})
-        positions.push({col:fromTop+1, row:fromLeft+2})
-        positions.push({col:fromTop+2, row:fromLeft+1})
+        positions.push(
+            {col:fromTop, row:fromLeft},
+            {col:fromTop, row:fromLeft+1},
+            {col:fromTop, row:fromLeft+2},
+            {col:fromTop+1, row:fromLeft+2},
+            {col:fromTop+2, row:fromLeft+1},
 
-        positions.push({col:fromTop, row:fromLeft+5})
-        positions.push({col:fromTop, row:fromLeft+1+5})
-        positions.push({col:fromTop, row:fromLeft+2+5})
-        positions.push({col:fromTop+1, row:fromLeft+2+5})
-        positions.push({col:fromTop+2, row:fromLeft+1+5})
+            {col:fromTop, row:fromLeft+5},
+            {col:fromTop, row:fromLeft+1+5},
+            {col:fromTop, row:fromLeft+2+5},
+            {col:fromTop+1, row:fromLeft+2+5},
+            {col:fromTop+2, row:fromLeft+1+5},
 
-        positions.push({col:fromTop+5, row:fromLeft})
-        positions.push({col:fromTop+5, row:fromLeft+1})
-        positions.push({col:fromTop+5, row:fromLeft+2})
-        positions.push({col:fromTop+1+5, row:fromLeft+2})
-        positions.push({col:fromTop+2+5, row:fromLeft+1})
+            {col:fromTop+5, row:fromLeft},
+            {col:fromTop+5, row:fromLeft+1},
+            {col:fromTop+5, row:fromLeft+2},
+            {col:fromTop+1+5, row:fromLeft+2},
+            {col:fromTop+2+5, row:fromLeft+1},
 
-        positions.push({col:fromTop+5, row:fromLeft+5})
-        positions.push({col:fromTop+5, row:fromLeft+1+5})
-        positions.push({col:fromTop+5, row:fromLeft+2+5})
-        positions.push({col:fromTop+1+5, row:fromLeft+2+5})
-        positions.push({col:fromTop+2+5, row:fromLeft+1+5})
+            {col:fromTop+5, row:fromLeft+5},
+            {col:fromTop+5, row:fromLeft+1+5},
+            {col:fromTop+5, row:fromLeft+2+5},
+            {col:fromTop+1+5, row:fromLeft+2+5},
+            {col:fromTop+2+5, row:fromLeft+1+5},
 
-        positions.push({col:fromTop, row:fromLeft-5})
-        positions.push({col:fromTop, row:fromLeft-1-5})
-        positions.push({col:fromTop, row:fromLeft-2-5})
-        positions.push({col:fromTop-1, row:fromLeft-2-5})
-        positions.push({col:fromTop-2, row:fromLeft-1-5})
+            {col:fromTop, row:fromLeft-5},
+            {col:fromTop, row:fromLeft-1-5},
+            {col:fromTop, row:fromLeft-2-5},
+            {col:fromTop-1, row:fromLeft-2-5},
+            {col:fromTop-2, row:fromLeft-1-5},
 
-        positions.push({col:fromTop, row:fromLeft-5-5})
-        positions.push({col:fromTop, row:fromLeft-1-5-5})
-        positions.push({col:fromTop, row:fromLeft-2-5-5})
-        positions.push({col:fromTop-1, row:fromLeft-2-5-5})
-        positions.push({col:fromTop-2, row:fromLeft-1-5-5})
+            {col:fromTop, row:fromLeft-5-5},
+            {col:fromTop, row:fromLeft-1-5-5},
+            {col:fromTop, row:fromLeft-2-5-5},
+            {col:fromTop-1, row:fromLeft-2-5-5},
+            {col:fromTop-2, row:fromLeft-1-5-5},
 
-        positions.push({col:fromTop+5, row:fromLeft-5})
-        positions.push({col:fromTop+5, row:fromLeft-1-5})
-        positions.push({col:fromTop+5, row:fromLeft-2-5})
-        positions.push({col:fromTop-1+5, row:fromLeft-2-5})
-        positions.push({col:fromTop-2+5, row:fromLeft-1-5})
+            {col:fromTop+5, row:fromLeft-5},
+            {col:fromTop+5, row:fromLeft-1-5},
+            {col:fromTop+5, row:fromLeft-2-5},
+            {col:fromTop-1+5, row:fromLeft-2-5},
+            {col:fromTop-2+5, row:fromLeft-1-5},
 
-        positions.push({col:fromTop+5, row:fromLeft-5-5})
-        positions.push({col:fromTop+5, row:fromLeft-1-5-5})
-        positions.push({col:fromTop+5, row:fromLeft-2-5-5})
-        positions.push({col:fromTop-1+5, row:fromLeft-2-5-5})
-        positions.push({col:fromTop-2+5, row:fromLeft-1-5-5})
+            {col:fromTop+5, row:fromLeft-5-5},
+            {col:fromTop+5, row:fromLeft-1-5-5},
+            {col:fromTop+5, row:fromLeft-2-5-5},
+            {col:fromTop-1+5, row:fromLeft-2-5-5},
+            {col:fromTop-2+5, row:fromLeft-1-5-5}
+        )
 
         positions.forEach(pos => {
             cell = matrix[pos.col][pos.row]
@@ -266,54 +268,56 @@ function setPreset(presetButton) {
 
         let positions = []
 
-        positions.push({col:fromTop, row:fromLeft})
-        positions.push({col:fromTop, row:fromLeft+1})
-        positions.push({col:fromTop+1, row:fromLeft+1})
-        positions.push({col:fromTop+1, row:fromLeft})
+        positions.push(
+            {col:fromTop, row:fromLeft},
+            {col:fromTop, row:fromLeft+1},
+            {col:fromTop+1, row:fromLeft+1},
+            {col:fromTop+1, row:fromLeft},
 
-        positions.push({col:fromTop, row:fromLeft+10})
-        positions.push({col:fromTop+1, row:fromLeft+10})
-        positions.push({col:fromTop+2, row:fromLeft+10})
+            {col:fromTop, row:fromLeft+10},
+            {col:fromTop+1, row:fromLeft+10},
+            {col:fromTop+2, row:fromLeft+10},
 
-        positions.push({col:fromTop-1, row:fromLeft+11})
-        positions.push({col:fromTop+3, row:fromLeft+11})
+            {col:fromTop-1, row:fromLeft+11},
+            {col:fromTop+3, row:fromLeft+11},
 
-        positions.push({col:fromTop-2, row:fromLeft+12})
-        positions.push({col:fromTop+4, row:fromLeft+12})
-        positions.push({col:fromTop-2, row:fromLeft+13})
-        positions.push({col:fromTop+4, row:fromLeft+13})
+            {col:fromTop-2, row:fromLeft+12},
+            {col:fromTop+4, row:fromLeft+12},
+            {col:fromTop-2, row:fromLeft+13},
+            {col:fromTop+4, row:fromLeft+13},
 
-        positions.push({col:fromTop+1, row:fromLeft+14})
+            {col:fromTop+1, row:fromLeft+14},
 
-        positions.push({col:fromTop-1, row:fromLeft+15})
-        positions.push({col:fromTop+3, row:fromLeft+15})
+            {col:fromTop-1, row:fromLeft+15},
+            {col:fromTop+3, row:fromLeft+15},
 
-        positions.push({col:fromTop, row:fromLeft+16})
-        positions.push({col:fromTop+1, row:fromLeft+16})
-        positions.push({col:fromTop+2, row:fromLeft+16})
+            {col:fromTop, row:fromLeft+16},
+            {col:fromTop+1, row:fromLeft+16},
+            {col:fromTop+2, row:fromLeft+16},
 
-        positions.push({col:fromTop+1, row:fromLeft+17})
+            {col:fromTop+1, row:fromLeft+17},
 
-        positions.push({col:fromTop-2, row:fromLeft+20})
-        positions.push({col:fromTop-1, row:fromLeft+20})
-        positions.push({col:fromTop, row:fromLeft+20})
+            {col:fromTop-2, row:fromLeft+20},
+            {col:fromTop-1, row:fromLeft+20},
+            {col:fromTop, row:fromLeft+20},
 
-        positions.push({col:fromTop-2, row:fromLeft+21})
-        positions.push({col:fromTop-1, row:fromLeft+21})
-        positions.push({col:fromTop, row:fromLeft+21})
+            {col:fromTop-2, row:fromLeft+21},
+            {col:fromTop-1, row:fromLeft+21},
+            {col:fromTop, row:fromLeft+21},
 
-        positions.push({col:fromTop-3, row:fromLeft+22})
-        positions.push({col:fromTop+1, row:fromLeft+22})
+            {col:fromTop-3, row:fromLeft+22},
+            {col:fromTop+1, row:fromLeft+22},
 
-        positions.push({col:fromTop-4, row:fromLeft+24})
-        positions.push({col:fromTop-3, row:fromLeft+24})
-        positions.push({col:fromTop+1, row:fromLeft+24})
-        positions.push({col:fromTop+2, row:fromLeft+24})
+            {col:fromTop-4, row:fromLeft+24},
+            {col:fromTop-3, row:fromLeft+24},
+            {col:fromTop+1, row:fromLeft+24},
+            {col:fromTop+2, row:fromLeft+24},
 
-        positions.push({col:fromTop-2, row:fromLeft+34})
-        positions.push({col:fromTop-2, row:fromLeft+35})
-        positions.push({col:fromTop-1, row:fromLeft+34})
-        positions.push({col:fromTop-1, row:fromLeft+35})
+            {col:fromTop-2, row:fromLeft+34},
+            {col:fromTop-2, row:fromLeft+35},
+            {col:fromTop-1, row:fromLeft+34},
+            {col:fromTop-1, row:fromLeft+35}
+        )
 
         positions.forEach(pos => {
             cell = matrix[pos.col][pos.row]
@@ -326,37 +330,39 @@ function setPreset(presetButton) {
 
         let positions = []
 
-        positions.push({col:fromTop-1, row:fromLeft})
-        positions.push({col:fromTop+1, row:fromLeft})
+        positions.push(
+            {col:fromTop-1, row:fromLeft},
+            {col:fromTop+1, row:fromLeft},
 
-        positions.push({col:fromTop, row:fromLeft+2})
+            {col:fromTop, row:fromLeft+2},
 
-        positions.push({col:fromTop-1, row:fromLeft+3})
-        positions.push({col:fromTop+1, row:fromLeft+3})
+            {col:fromTop-1, row:fromLeft+3},
+            {col:fromTop+1, row:fromLeft+3},
 
-        positions.push({col:fromTop-2, row:fromLeft+4})
-        positions.push({col:fromTop, row:fromLeft+4})
-        positions.push({col:fromTop+2, row:fromLeft+4})
+            {col:fromTop-2, row:fromLeft+4},
+            {col:fromTop, row:fromLeft+4},
+            {col:fromTop+2, row:fromLeft+4},
 
-        positions.push({col:fromTop-2, row:fromLeft+5})
-        positions.push({col:fromTop-1, row:fromLeft+5})
-        positions.push({col:fromTop+1, row:fromLeft+5})
+            {col:fromTop-2, row:fromLeft+5},
+            {col:fromTop-1, row:fromLeft+5},
+            {col:fromTop+1, row:fromLeft+5},
 
-        positions.push({col:fromTop-2, row:fromLeft+6})
-        positions.push({col:fromTop-1, row:fromLeft+6})
-        positions.push({col:fromTop+1, row:fromLeft+6})
+            {col:fromTop-2, row:fromLeft+6},
+            {col:fromTop-1, row:fromLeft+6},
+            {col:fromTop+1, row:fromLeft+6},
 
-        positions.push({col:fromTop-2, row:fromLeft+7})
-        positions.push({col:fromTop, row:fromLeft+7})
-        positions.push({col:fromTop+2, row:fromLeft+7})
+            {col:fromTop-2, row:fromLeft+7},
+            {col:fromTop, row:fromLeft+7},
+            {col:fromTop+2, row:fromLeft+7},
 
-        positions.push({col:fromTop-1, row:fromLeft+8})
-        positions.push({col:fromTop+1, row:fromLeft+8})
+            {col:fromTop-1, row:fromLeft+8},
+            {col:fromTop+1, row:fromLeft+8},
 
-        positions.push({col:fromTop, row:fromLeft+9})
+            {col:fromTop, row:fromLeft+9},
 
-        positions.push({col:fromTop-1, row:fromLeft+11})
-        positions.push({col:fromTop+1, row:fromLeft+11})
+            {col:fromTop-1, row:fromLeft+11},
+            {col:fromTop+1, row:fromLeft+11}
+        )
 
         positions.forEach(pos => {
             cell = matrix[pos.col][pos.row]
