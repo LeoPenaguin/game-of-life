@@ -1,115 +1,110 @@
+let width = 100;
+let height = 50;
+let matrix = [];
+let generationCount = 0;
+let isRunning = false;
 
-let width = 100
-let height = 50
-let matrix = []
-let generationCount = 0
-let isRunning = false
-
-
-let playButton = document.getElementById("play")
-let genCounter = document.getElementById("genCount")
-let resetButton = document.getElementById("reset")
+let playButton = document.getElementById("play");
+let genCounter = document.getElementById("genCount");
+let resetButton = document.getElementById("reset");
 
 // presets
-let presets = document.getElementsByClassName("preset")
+let presets = document.getElementsByClassName("preset");
 
 document.addEventListener("DOMContentLoaded", generateInitalGridView);
 playButton.addEventListener("click", stopStartOnClick);
 resetButton.addEventListener("click", reset);
 
 for (let preset of presets) {
-    preset.addEventListener("click", setPreset);
-};
+  preset.addEventListener("click", setPreset);
+}
 
 function stopStartOnClick(el) {
-    isRunning = !isRunning
+  isRunning = !isRunning;
 
-    if (isRunning) {
-        playButton.className += ' running'
-    } else {
-        playButton.classList.remove('running');
-    }
+  if (isRunning) {
+    playButton.className += " running";
+  } else {
+    playButton.classList.remove("running");
+  }
 }
 
 function reset() {
-    generationCount = 0
-    isRunning = false
-    genCounter.innerHTML = generationCount;
-    playButton.classList.remove('running');
-    generateInitalGridView()
+  generationCount = 0;
+  isRunning = false;
+  genCounter.innerHTML = generationCount;
+  playButton.classList.remove("running");
+  generateInitalGridView();
 }
 
 // ===============================================================================
 // ONLOAD
 
 // Generate initila grid view
-function generateInitalGridView () {
+function generateInitalGridView() {
+  createMatrix();
 
-    createMatrix()
+  container.style.gridTemplateColumns = "repeat(" + width + ", 1fr)";
+  container.style.gridTemplateRow = "repeat(" + height + ", 1fr)";
+  container.innerHTML = null;
 
-    container.style.gridTemplateColumns = "repeat(" + width + ", 1fr)";
-    container.style.gridTemplateRow = "repeat(" + height + ", 1fr)";
-    container.innerHTML = null;
+  for (var i = 0; i < matrix.length; i++) {
+    var line = matrix[i];
+    for (var j = 0; j < line.length; j++) {
+      let square = document.createElement("div");
 
-    for(var i = 0; i < matrix.length; i++) {
-        var line = matrix[i];
-        for(var j = 0; j < line.length; j++) {
-            let square = document.createElement('div')
+      square.dataset.row = i;
+      square.dataset.col = j;
+      square.dataset.living = false;
 
-            square.dataset.row = i
-            square.dataset.col = j
-            square.dataset.living = false
-        
-            square.className += 'square'
+      square.className += "square";
 
-            square.addEventListener("click", clickedSquare);
-            container.appendChild(square)
-        }
+      square.addEventListener("click", clickedSquare);
+      container.appendChild(square);
     }
+  }
 }
 
 // Create a matrix
-function createMatrix()
-{
-    matrix = new Array(height);
+function createMatrix() {
+  matrix = new Array(height);
 
-    for (var i = 0; i < matrix.length; i++) {
-        matrix[i] = new Array(width);
+  for (var i = 0; i < matrix.length; i++) {
+    matrix[i] = new Array(width);
+  }
+
+  for (var i = 0; i < matrix.length; i++) {
+    var line = matrix[i];
+    for (var j = 0; j < line.length; j++) {
+      matrix[i][j] = { living: false };
     }
-    
-    for(var i = 0; i < matrix.length; i++) {
-        var line = matrix[i];
-        for(var j = 0; j < line.length; j++) {
-            matrix[i][j] = {'living': false}
-        }
-    }
+  }
 }
 
-const interval = setInterval(function() {
-    let livingCells = []
+const interval = setInterval(function () {
+  let livingCells = [];
 
-    if (isRunning) {
-        generationCount += 1
-        genCounter.innerHTML = generationCount;
+  if (isRunning) {
+    generationCount += 1;
+    genCounter.innerHTML = generationCount;
 
-        calculateGeneration()
-    }
+    calculateGeneration();
+  }
 }, 100);
 
 // ===============================================================================
 // ON CELL CLICKED
 
 // Handle grid cell clicked
-function clickedSquare(el)
-{
-    const square = event.target
-    const col = square.dataset.col
-    const row = square.dataset.row
+function clickedSquare(el) {
+  const square = event.target;
+  const col = square.dataset.col;
+  const row = square.dataset.row;
 
-    let living = matrix[row][col].living
-    matrix[row][col].living = !living
+  let living = matrix[row][col].living;
+  matrix[row][col].living = !living;
 
-    recalculateCellView(row, col)
+  recalculateCellView(row, col);
 }
 
 // ===============================================================================
@@ -117,271 +112,269 @@ function clickedSquare(el)
 
 // Recalculate grid view
 function recalculateCellView(i, j) {
-    let square = document.querySelectorAll('[data-col="'+ j +'"][data-row="'+ i +'"]');
-    let living = matrix[i][j].living
+  let square = document.querySelectorAll(
+    '[data-col="' + j + '"][data-row="' + i + '"]'
+  );
+  let living = matrix[i][j].living;
 
-    if (living) {
-        square[0].className += ' living'
-        square[0].className += ' hasLived'
-    } else {
-        square[0].classList.remove('living');
-    }
+  if (living) {
+    square[0].className += " living";
+    square[0].className += " hasLived";
+  } else {
+    square[0].classList.remove("living");
+  }
 }
 
 // Kill / Awake cells
 function calculateGeneration() {
-    let changingCells = []
+  let changingCells = [];
 
-    for(var i = 0; i < matrix.length; i++) {
-        var line = matrix[i];
-        for(var j = 0; j < line.length; j++) {
-            
-            let cell = matrix[i][j]
-            let cellIsLiving = cell.living
-            let livingNeighboursCount = getAliveAroundCount(i, j)
-            
-            if (!cellIsLiving && livingNeighboursCount == 3) {
-                changingCells.push({col:i, row:j, isAlive:true})
-            } else if (cellIsLiving && livingNeighboursCount <= 1) {
-                changingCells.push({col:i, row:j, isAlive:false})
-            } else if (cellIsLiving && livingNeighboursCount >= 4) {
-                changingCells.push({col:i, row:j, isAlive:false})
-            } else if (cellIsLiving && (livingNeighboursCount == 2 || livingNeighboursCount == 3)) {
-                changingCells.push({col:i, row:j, isAlive:true})
-            }
-        }
+  for (var i = 0; i < matrix.length; i++) {
+    var line = matrix[i];
+    for (var j = 0; j < line.length; j++) {
+      let cell = matrix[i][j];
+      let cellIsLiving = cell.living;
+      let livingNeighboursCount = getAliveAroundCount(i, j);
+
+      if (!cellIsLiving && livingNeighboursCount == 3) {
+        changingCells.push({ col: i, row: j, isAlive: true });
+      } else if (cellIsLiving && livingNeighboursCount <= 1) {
+        changingCells.push({ col: i, row: j, isAlive: false });
+      } else if (cellIsLiving && livingNeighboursCount >= 4) {
+        changingCells.push({ col: i, row: j, isAlive: false });
+      } else if (
+        cellIsLiving &&
+        (livingNeighboursCount == 2 || livingNeighboursCount == 3)
+      ) {
+        changingCells.push({ col: i, row: j, isAlive: true });
+      }
     }
+  }
 
-    // SET
-    changingCells.forEach(changingCell => {
-        matrix[changingCell.col][changingCell.row].living = changingCell.isAlive
-        recalculateCellView(changingCell.col, changingCell.row)
-    });
+  // SET
+  changingCells.forEach((changingCell) => {
+    matrix[changingCell.col][changingCell.row].living = changingCell.isAlive;
+    recalculateCellView(changingCell.col, changingCell.row);
+  });
 }
 
 // Neighnour count
 function getAliveAroundCount(i, j) {
-    let around = []
+  let around = [];
 
-    if (matrix[i-1] !== undefined) {
-        around.push(matrix[i-1][j-1])
-        around.push(matrix[i-1][j])
-        around.push(matrix[i-1][j+1])
+  if (matrix[i - 1] !== undefined) {
+    around.push(matrix[i - 1][j - 1]);
+    around.push(matrix[i - 1][j]);
+    around.push(matrix[i - 1][j + 1]);
+  }
+
+  around.push(matrix[i][j - 1]);
+  around.push(matrix[i][j + 1]);
+
+  if (matrix[i + 1] !== undefined) {
+    around.push(matrix[i + 1][j - 1]);
+    around.push(matrix[i + 1][j]);
+    around.push(matrix[i + 1][j + 1]);
+  }
+
+  let aliveNeighboursCount = 0;
+
+  around.forEach((element) => {
+    if (element && element.living === true) {
+      aliveNeighboursCount++;
     }
+  });
 
-    around.push(matrix[i][j-1])
-    around.push(matrix[i][j+1])
-
-    if (matrix[i+1] !== undefined) {
-        around.push(matrix[i+1][j-1])
-        around.push(matrix[i+1][j])
-        around.push(matrix[i+1][j+1])
-    }
-
-    let aliveNeighboursCount = 0
-
-    around.forEach(element => {
-        if (element && element.living === true) {
-            aliveNeighboursCount++
-        }
-    })
-
-    return aliveNeighboursCount
+  return aliveNeighboursCount;
 }
 
 // ===============================================================================
 // PRESETS
 
 function setPreset(presetButton) {
+  reset();
 
-    reset()
+  let el = presetButton.target.closest(".preset");
+  let preset = el.dataset.preset;
 
-    let el = presetButton.target.closest(".preset")
-    let preset = el.dataset.preset
+  let fromTop = Math.floor(height / 4);
+  let fromLeft = Math.floor(width / 4);
 
-    let fromTop = Math.floor(height/4)
-    let fromLeft = Math.floor(width/4)
+  if (preset == 1) {
+    let positions = [];
 
+    positions.push(
+      { col: fromTop, row: fromLeft },
+      { col: fromTop, row: fromLeft + 1 },
+      { col: fromTop, row: fromLeft + 2 },
+      { col: fromTop + 1, row: fromLeft + 2 },
+      { col: fromTop + 2, row: fromLeft + 1 },
 
-    if (preset == 1) {
+      { col: fromTop, row: fromLeft + 5 },
+      { col: fromTop, row: fromLeft + 1 + 5 },
+      { col: fromTop, row: fromLeft + 2 + 5 },
+      { col: fromTop + 1, row: fromLeft + 2 + 5 },
+      { col: fromTop + 2, row: fromLeft + 1 + 5 },
 
-        let positions = []
+      { col: fromTop + 5, row: fromLeft },
+      { col: fromTop + 5, row: fromLeft + 1 },
+      { col: fromTop + 5, row: fromLeft + 2 },
+      { col: fromTop + 1 + 5, row: fromLeft + 2 },
+      { col: fromTop + 2 + 5, row: fromLeft + 1 },
 
-        positions.push(
-            {col:fromTop, row:fromLeft},
-            {col:fromTop, row:fromLeft+1},
-            {col:fromTop, row:fromLeft+2},
-            {col:fromTop+1, row:fromLeft+2},
-            {col:fromTop+2, row:fromLeft+1},
+      { col: fromTop + 5, row: fromLeft + 5 },
+      { col: fromTop + 5, row: fromLeft + 1 + 5 },
+      { col: fromTop + 5, row: fromLeft + 2 + 5 },
+      { col: fromTop + 1 + 5, row: fromLeft + 2 + 5 },
+      { col: fromTop + 2 + 5, row: fromLeft + 1 + 5 },
 
-            {col:fromTop, row:fromLeft+5},
-            {col:fromTop, row:fromLeft+1+5},
-            {col:fromTop, row:fromLeft+2+5},
-            {col:fromTop+1, row:fromLeft+2+5},
-            {col:fromTop+2, row:fromLeft+1+5},
+      { col: fromTop, row: fromLeft - 5 },
+      { col: fromTop, row: fromLeft - 1 - 5 },
+      { col: fromTop, row: fromLeft - 2 - 5 },
+      { col: fromTop - 1, row: fromLeft - 2 - 5 },
+      { col: fromTop - 2, row: fromLeft - 1 - 5 },
 
-            {col:fromTop+5, row:fromLeft},
-            {col:fromTop+5, row:fromLeft+1},
-            {col:fromTop+5, row:fromLeft+2},
-            {col:fromTop+1+5, row:fromLeft+2},
-            {col:fromTop+2+5, row:fromLeft+1},
+      { col: fromTop, row: fromLeft - 5 - 5 },
+      { col: fromTop, row: fromLeft - 1 - 5 - 5 },
+      { col: fromTop, row: fromLeft - 2 - 5 - 5 },
+      { col: fromTop - 1, row: fromLeft - 2 - 5 - 5 },
+      { col: fromTop - 2, row: fromLeft - 1 - 5 - 5 },
 
-            {col:fromTop+5, row:fromLeft+5},
-            {col:fromTop+5, row:fromLeft+1+5},
-            {col:fromTop+5, row:fromLeft+2+5},
-            {col:fromTop+1+5, row:fromLeft+2+5},
-            {col:fromTop+2+5, row:fromLeft+1+5},
+      { col: fromTop + 5, row: fromLeft - 5 },
+      { col: fromTop + 5, row: fromLeft - 1 - 5 },
+      { col: fromTop + 5, row: fromLeft - 2 - 5 },
+      { col: fromTop - 1 + 5, row: fromLeft - 2 - 5 },
+      { col: fromTop - 2 + 5, row: fromLeft - 1 - 5 },
 
-            {col:fromTop, row:fromLeft-5},
-            {col:fromTop, row:fromLeft-1-5},
-            {col:fromTop, row:fromLeft-2-5},
-            {col:fromTop-1, row:fromLeft-2-5},
-            {col:fromTop-2, row:fromLeft-1-5},
+      { col: fromTop + 5, row: fromLeft - 5 - 5 },
+      { col: fromTop + 5, row: fromLeft - 1 - 5 - 5 },
+      { col: fromTop + 5, row: fromLeft - 2 - 5 - 5 },
+      { col: fromTop - 1 + 5, row: fromLeft - 2 - 5 - 5 },
+      { col: fromTop - 2 + 5, row: fromLeft - 1 - 5 - 5 }
+    );
 
-            {col:fromTop, row:fromLeft-5-5},
-            {col:fromTop, row:fromLeft-1-5-5},
-            {col:fromTop, row:fromLeft-2-5-5},
-            {col:fromTop-1, row:fromLeft-2-5-5},
-            {col:fromTop-2, row:fromLeft-1-5-5},
+    positions.forEach((pos) => {
+      cell = matrix[pos.col][pos.row];
+      cell.living = true;
+      recalculateCellView(pos.col, pos.row);
+    });
+  }
 
-            {col:fromTop+5, row:fromLeft-5},
-            {col:fromTop+5, row:fromLeft-1-5},
-            {col:fromTop+5, row:fromLeft-2-5},
-            {col:fromTop-1+5, row:fromLeft-2-5},
-            {col:fromTop-2+5, row:fromLeft-1-5},
+  if (preset == 2) {
+    let positions = [];
 
-            {col:fromTop+5, row:fromLeft-5-5},
-            {col:fromTop+5, row:fromLeft-1-5-5},
-            {col:fromTop+5, row:fromLeft-2-5-5},
-            {col:fromTop-1+5, row:fromLeft-2-5-5},
-            {col:fromTop-2+5, row:fromLeft-1-5-5}
-        )
+    positions.push(
+      { col: fromTop, row: fromLeft },
+      { col: fromTop, row: fromLeft + 1 },
+      { col: fromTop + 1, row: fromLeft + 1 },
+      { col: fromTop + 1, row: fromLeft },
 
-        positions.forEach(pos => {
-            cell = matrix[pos.col][pos.row]
-            cell.living = true
-            recalculateCellView(pos.col, pos.row)
-        })
-    }
+      { col: fromTop, row: fromLeft + 10 },
+      { col: fromTop + 1, row: fromLeft + 10 },
+      { col: fromTop + 2, row: fromLeft + 10 },
 
-    if (preset == 2) {
+      { col: fromTop - 1, row: fromLeft + 11 },
+      { col: fromTop + 3, row: fromLeft + 11 },
 
-        let positions = []
+      { col: fromTop - 2, row: fromLeft + 12 },
+      { col: fromTop + 4, row: fromLeft + 12 },
+      { col: fromTop - 2, row: fromLeft + 13 },
+      { col: fromTop + 4, row: fromLeft + 13 },
 
-        positions.push(
-            {col:fromTop, row:fromLeft},
-            {col:fromTop, row:fromLeft+1},
-            {col:fromTop+1, row:fromLeft+1},
-            {col:fromTop+1, row:fromLeft},
+      { col: fromTop + 1, row: fromLeft + 14 },
 
-            {col:fromTop, row:fromLeft+10},
-            {col:fromTop+1, row:fromLeft+10},
-            {col:fromTop+2, row:fromLeft+10},
+      { col: fromTop - 1, row: fromLeft + 15 },
+      { col: fromTop + 3, row: fromLeft + 15 },
 
-            {col:fromTop-1, row:fromLeft+11},
-            {col:fromTop+3, row:fromLeft+11},
+      { col: fromTop, row: fromLeft + 16 },
+      { col: fromTop + 1, row: fromLeft + 16 },
+      { col: fromTop + 2, row: fromLeft + 16 },
 
-            {col:fromTop-2, row:fromLeft+12},
-            {col:fromTop+4, row:fromLeft+12},
-            {col:fromTop-2, row:fromLeft+13},
-            {col:fromTop+4, row:fromLeft+13},
+      { col: fromTop + 1, row: fromLeft + 17 },
 
-            {col:fromTop+1, row:fromLeft+14},
+      { col: fromTop - 2, row: fromLeft + 20 },
+      { col: fromTop - 1, row: fromLeft + 20 },
+      { col: fromTop, row: fromLeft + 20 },
 
-            {col:fromTop-1, row:fromLeft+15},
-            {col:fromTop+3, row:fromLeft+15},
+      { col: fromTop - 2, row: fromLeft + 21 },
+      { col: fromTop - 1, row: fromLeft + 21 },
+      { col: fromTop, row: fromLeft + 21 },
 
-            {col:fromTop, row:fromLeft+16},
-            {col:fromTop+1, row:fromLeft+16},
-            {col:fromTop+2, row:fromLeft+16},
+      { col: fromTop - 3, row: fromLeft + 22 },
+      { col: fromTop + 1, row: fromLeft + 22 },
 
-            {col:fromTop+1, row:fromLeft+17},
+      { col: fromTop - 4, row: fromLeft + 24 },
+      { col: fromTop - 3, row: fromLeft + 24 },
+      { col: fromTop + 1, row: fromLeft + 24 },
+      { col: fromTop + 2, row: fromLeft + 24 },
 
-            {col:fromTop-2, row:fromLeft+20},
-            {col:fromTop-1, row:fromLeft+20},
-            {col:fromTop, row:fromLeft+20},
+      { col: fromTop - 2, row: fromLeft + 34 },
+      { col: fromTop - 2, row: fromLeft + 35 },
+      { col: fromTop - 1, row: fromLeft + 34 },
+      { col: fromTop - 1, row: fromLeft + 35 }
+    );
 
-            {col:fromTop-2, row:fromLeft+21},
-            {col:fromTop-1, row:fromLeft+21},
-            {col:fromTop, row:fromLeft+21},
+    positions.forEach((pos) => {
+      cell = matrix[pos.col][pos.row];
+      cell.living = true;
+      recalculateCellView(pos.col, pos.row);
+    });
+  }
 
-            {col:fromTop-3, row:fromLeft+22},
-            {col:fromTop+1, row:fromLeft+22},
+  if (preset == 3) {
+    let positions = [];
 
-            {col:fromTop-4, row:fromLeft+24},
-            {col:fromTop-3, row:fromLeft+24},
-            {col:fromTop+1, row:fromLeft+24},
-            {col:fromTop+2, row:fromLeft+24},
+    positions.push(
+      { col: fromTop - 1, row: fromLeft },
+      { col: fromTop + 1, row: fromLeft },
 
-            {col:fromTop-2, row:fromLeft+34},
-            {col:fromTop-2, row:fromLeft+35},
-            {col:fromTop-1, row:fromLeft+34},
-            {col:fromTop-1, row:fromLeft+35}
-        )
+      { col: fromTop, row: fromLeft + 2 },
 
-        positions.forEach(pos => {
-            cell = matrix[pos.col][pos.row]
-            cell.living = true
-            recalculateCellView(pos.col, pos.row)
-        })
-    }
+      { col: fromTop - 1, row: fromLeft + 3 },
+      { col: fromTop + 1, row: fromLeft + 3 },
 
-    if (preset == 3) {
+      { col: fromTop - 2, row: fromLeft + 4 },
+      { col: fromTop, row: fromLeft + 4 },
+      { col: fromTop + 2, row: fromLeft + 4 },
 
-        let positions = []
+      { col: fromTop - 2, row: fromLeft + 5 },
+      { col: fromTop - 1, row: fromLeft + 5 },
+      { col: fromTop + 1, row: fromLeft + 5 },
 
-        positions.push(
-            {col:fromTop-1, row:fromLeft},
-            {col:fromTop+1, row:fromLeft},
+      { col: fromTop - 2, row: fromLeft + 6 },
+      { col: fromTop - 1, row: fromLeft + 6 },
+      { col: fromTop + 1, row: fromLeft + 6 },
 
-            {col:fromTop, row:fromLeft+2},
+      { col: fromTop - 2, row: fromLeft + 7 },
+      { col: fromTop, row: fromLeft + 7 },
+      { col: fromTop + 2, row: fromLeft + 7 },
 
-            {col:fromTop-1, row:fromLeft+3},
-            {col:fromTop+1, row:fromLeft+3},
+      { col: fromTop - 1, row: fromLeft + 8 },
+      { col: fromTop + 1, row: fromLeft + 8 },
 
-            {col:fromTop-2, row:fromLeft+4},
-            {col:fromTop, row:fromLeft+4},
-            {col:fromTop+2, row:fromLeft+4},
+      { col: fromTop, row: fromLeft + 9 },
 
-            {col:fromTop-2, row:fromLeft+5},
-            {col:fromTop-1, row:fromLeft+5},
-            {col:fromTop+1, row:fromLeft+5},
+      { col: fromTop - 1, row: fromLeft + 11 },
+      { col: fromTop + 1, row: fromLeft + 11 }
+    );
 
-            {col:fromTop-2, row:fromLeft+6},
-            {col:fromTop-1, row:fromLeft+6},
-            {col:fromTop+1, row:fromLeft+6},
+    positions.forEach((pos) => {
+      cell = matrix[pos.col][pos.row];
+      cell.living = true;
+      recalculateCellView(pos.col, pos.row);
+    });
+  }
 
-            {col:fromTop-2, row:fromLeft+7},
-            {col:fromTop, row:fromLeft+7},
-            {col:fromTop+2, row:fromLeft+7},
-
-            {col:fromTop-1, row:fromLeft+8},
-            {col:fromTop+1, row:fromLeft+8},
-
-            {col:fromTop, row:fromLeft+9},
-
-            {col:fromTop-1, row:fromLeft+11},
-            {col:fromTop+1, row:fromLeft+11}
-        )
-
-        positions.forEach(pos => {
-            cell = matrix[pos.col][pos.row]
-            cell.living = true
-            recalculateCellView(pos.col, pos.row)
-        })
-    }
-
-    if (preset == 4) {
-        for(var i = 0; i < matrix.length; i++) {
-            var line = matrix[i];
-            for(var j = 0; j < line.length; j++) {
-                if (Math.floor(Math.random() * 9) == 1) {
-                    cell = matrix[i][j]
-                    cell.living = true
-                    recalculateCellView(i, j)
-                }
-            }
+  if (preset == 4) {
+    for (var i = 0; i < matrix.length; i++) {
+      var line = matrix[i];
+      for (var j = 0; j < line.length; j++) {
+        if (Math.floor(Math.random() * 9) == 1) {
+          cell = matrix[i][j];
+          cell.living = true;
+          recalculateCellView(i, j);
         }
+      }
     }
-
+  }
 }
