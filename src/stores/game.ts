@@ -5,8 +5,9 @@ import { defineStore } from "pinia";
 export const useGameStore = defineStore({
   id: "counter",
   state: () => ({
-    width: 50,
+    width: 100,
     height: 50,
+    speed: 100,
     matrix: [] as Cell[][],
     generationCount: 0,
     isRunning: false,
@@ -20,18 +21,11 @@ export const useGameStore = defineStore({
   }),
   actions: {
     createMatrix() {
-      this.matrix = new Array(this.height);
-
-      for (let i = 0; i < this.matrix.length; i++) {
-        this.matrix[i] = new Array(this.width);
-      }
-
-      for (let i = 0; i < this.matrix.length; i++) {
-        const line = this.matrix[i];
-        for (let j = 0; j < line.length; j++) {
-          this.matrix[i][j] = { living: false };
-        }
-      }
+      this.matrix = [...Array(this.height)].map(() => {
+        return [...Array(this.width)].map(() => {
+          return { living: false };
+        });
+      });
     },
     setPreset(preset: Preset) {
       this.reset();
@@ -222,46 +216,33 @@ export const useGameStore = defineStore({
       this.setIsRunning(false);
     },
     calculateGeneration(): void {
-      const changingCells = [] as {
-        col: number;
-        row: number;
-        alive: boolean;
-      }[];
-
-      for (let i = 0; i < this.matrix.length; i++) {
-        const line = this.matrix[i];
-        for (let j = 0; j < line.length; j++) {
-          const cell: Cell = this.matrix[i][j];
+      this.matrix = this.matrix.map((row, i) => {
+        return row.map((cell: Cell, j) => {
           const livingNeighboursCount = this.getAliveAroundCount(i, j);
 
-          if (!cell.living && livingNeighboursCount === 3) {
-            changingCells.push({ col: i, row: j, alive: true });
-          } else if (cell.living && livingNeighboursCount <= 1) {
-            changingCells.push({ col: i, row: j, alive: false });
-          } else if (cell.living && livingNeighboursCount >= 4) {
-            changingCells.push({ col: i, row: j, alive: false });
-          } else if (
-            cell.living &&
-            (livingNeighboursCount === 2 || livingNeighboursCount === 3)
-          ) {
-            changingCells.push({ col: i, row: j, alive: true });
+          if (cell.living) {
+            cell = { ...cell, hasLived: true };
           }
-        }
-      }
 
-      changingCells.forEach((changingCell) => {
-        const cell = this.matrix[changingCell.col][changingCell.row];
+          if (
+            (cell.living && livingNeighboursCount <= 1) ||
+            (cell.living && livingNeighboursCount >= 4)
+          ) {
+            return { ...cell, living: false };
+          } else if (
+            (cell.living &&
+              (livingNeighboursCount === 2 || livingNeighboursCount === 3)) ||
+            (!cell.living && livingNeighboursCount === 3)
+          ) {
+            return { ...cell, living: true };
+          }
 
-        if (cell.living) {
-          cell.living = changingCell.alive;
-          cell.hasLived = true;
-        } else {
-          cell.living = changingCell.alive;
-        }
+          return cell;
+        });
       });
     },
     getAliveAroundCount(i: number, j: number): number {
-      const around = [] as Cell[];
+      const around = [] as (Cell | undefined)[];
 
       if (this.matrix[i - 1] !== undefined) {
         around.push(this.matrix[i - 1][j - 1]);
@@ -305,7 +286,7 @@ export const useGameStore = defineStore({
         this.generationCount += 1;
         this.calculateGeneration();
         this.startTimer();
-      }, 100);
+      }, this.speed);
     },
     stopTimer(): void {
       clearTimeout(this.timerID);

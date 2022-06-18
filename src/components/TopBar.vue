@@ -21,8 +21,8 @@ const stopStartOnClick = () => {
       :class="{ running: gameStore.isRunning }"
       class="base-btn"
     >
-      <pause-icon class="paused" />
-      <play-icon class="playing" />
+      <pause-icon v-if="gameStore.isRunning" class="paused" />
+      <play-icon v-else class="playing" />
     </button>
     <span id="genCount">{{ gameStore.generationCount }}</span>
 
@@ -44,77 +44,68 @@ const stopStartOnClick = () => {
 
 <style lang="scss" scoped>
 #top-bar {
-  margin: 1rem 0;
-  border-radius: 0.5rem;
+  padding: 0.5rem;
   display: flex;
   align-items: center;
+  background: rgb(255, 255, 255);
 }
 
 .base-btn {
   padding: 0.5rem 1rem;
-  border: 2px solid;
+  border: 0.3rem solid;
   border-radius: 0.5rem;
+  box-shadow: 0px 0.5rem 0;
   font-weight: bold;
   color: rgb(30, 255, 0);
   background: none;
   outline: none;
   cursor: pointer;
-  margin-right: 0.5rem;
+  margin: 0 0.5rem 0.5rem 0;
   display: flex;
   align-items: center;
-  box-shadow: 0 0 0.5rem;
+  background: white;
+  &:hover {
+    box-shadow: 0px 0.3rem 0px;
+    margin-bottom: 0.3rem;
+    margin-top: 0.2rem;
+  }
+  &:active {
+    box-shadow: 0px 0px 0px;
+    margin-bottom: 0;
+    margin-top: 0.5rem;
+  }
 }
 
-#top-bar #play .playing {
-  stroke: rgb(30, 255, 0);
-  height: 1.5rem;
-  width: 1.5rem;
-}
-
-#top-bar #play .paused {
-  stroke: rgb(59, 59, 59);
-  height: 1.5rem;
-  width: 1.5rem;
-}
-
-#top-bar #play.running {
-  color: rgb(0, 153, 255);
-}
-
-#top-bar #play.running .playing {
-  stroke: rgb(59, 59, 59);
-  height: 1.5rem;
-  width: 1.5rem;
-}
-
-#top-bar #play.running .paused {
-  stroke: rgb(0, 153, 255);
-  height: 1.5rem;
-  width: 1.5rem;
+#top-bar #play {
+  color: red;
+  .paused,
+  .playing {
+    stroke: currentcolor;
+    height: 1.5rem;
+    width: 1.5rem;
+  }
 }
 
 #top-bar #genCount {
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
   font-weight: bold;
-  color: rgb(255, 255, 255);
-  background: rgba(0, 0, 0, 0.3);
+  color: red;
   margin-right: 1rem;
+  font-size: 2rem;
+  width: 4rem;
 }
 
 #top-bar #reset {
   color: rgb(255, 179, 0);
-}
-#top-bar #reset svg {
-  stroke: rgb(255, 179, 0);
+  svg {
+    stroke: currentcolor;
+  }
 }
 
 .preset {
   color: rgb(255, 0, 157);
-}
-
-.preset svg {
-  stroke: rgb(255, 0, 157);
-  margin-right: 0.5rem;
+  svg {
+    stroke: currentcolor;
+    margin-right: 0.5rem;
+  }
 }
 </style>
