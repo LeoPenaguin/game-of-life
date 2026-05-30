@@ -3,13 +3,12 @@ import PauseIcon from "./icons/pauseIcon.vue";
 import PlayIcon from "./icons/playIcon.vue";
 import ResetIcon from "./icons/resetIcon.vue";
 import PresetIcon from "./icons/presetIcon.vue";
-import { useGameStore } from "../stores/game";
+import { useGame } from "../composables/useGame";
 
-const gameStore = useGameStore();
-let timerID = 0;
+const { state, setIsRunning, reset, setPreset } = useGame();
 
 const stopStartOnClick = () => {
-  gameStore.setIsRunning(!gameStore.isRunning);
+  setIsRunning(!state.isRunning);
 };
 </script>
 
@@ -18,22 +17,22 @@ const stopStartOnClick = () => {
     <button
       id="play"
       @click="stopStartOnClick"
-      :class="{ running: gameStore.isRunning }"
+      :class="{ running: state.isRunning }"
       class="base-btn"
     >
-      <pause-icon v-if="gameStore.isRunning" class="paused" />
+      <pause-icon v-if="state.isRunning" class="paused" />
       <play-icon v-else class="playing" />
     </button>
-    <span id="genCount">{{ gameStore.generationCount }}</span>
+    <span id="genCount">{{ state.generationCount }}</span>
 
-    <button id="reset" @click="gameStore.reset" class="base-btn">
+    <button id="reset" @click="reset" class="base-btn">
       <reset-icon />
     </button>
 
     <button
-      v-for="preset in gameStore.presets"
+      v-for="preset in state.presets"
       class="base-btn preset"
-      @click="gameStore.setPreset(preset)"
+      @click="setPreset(preset)"
       :key="preset.id"
     >
       <preset-icon />

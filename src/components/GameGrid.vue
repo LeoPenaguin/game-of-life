@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import type { Cell } from "@/typings/game";
+import { computed } from "vue";
+import type { Cell } from "@/types";
 import type { StyleValue } from "vue";
-import { useGameStore } from "../stores/game";
+import { useGame } from "../composables/useGame";
 
-const gameStore = useGameStore();
+const { state } = useGame();
 
-const style: StyleValue = {
-  gridTemplateColumns: "repeat(" + gameStore.width + ", 1fr)",
-  "grid-template-rows": "repeat(" + gameStore.height + ", 1fr)",
-};
+const gridStyle = computed<StyleValue>(() => ({
+  gridTemplateColumns: `repeat(${state.width}, 1fr)`,
+  gridTemplateRows: `repeat(${state.height}, 1fr)`,
+}));
 
 const clickedCell = (cell: Cell) => {
   cell.living = !cell.living;
@@ -17,8 +18,8 @@ const clickedCell = (cell: Cell) => {
 </script>
 
 <template>
-  <div id="grid" :style="style">
-    <template v-for="(line, index) in gameStore.matrix" :key="index">
+  <div id="grid" :style="gridStyle">
+    <template v-for="(line, index) in state.matrix" :key="index">
       <div
         v-for="(cell, index2) in line"
         :key="index2"
@@ -33,16 +34,15 @@ const clickedCell = (cell: Cell) => {
 <style lang="scss" scoped>
 #grid {
   display: grid;
-  width: fit-content;
-  height: fit-content;
-  border: 1px solid rgba(0, 0, 0, 0.4);
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .square {
   background: rgba(255, 255, 255, 0.07);
-  width: 0.7rem;
-  height: 0.7rem;
   border: 1px solid rgba(0, 0, 0, 0.4);
+  box-sizing: border-box;
 }
 
 .square.hasLived {
