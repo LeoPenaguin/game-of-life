@@ -29,15 +29,20 @@ function createMatrix() {
   );
 }
 
-function getAliveAroundCount(i: number, j: number): number {
+function getAliveAroundCount(row: number, col: number): number {
   let count = 0;
-  for (let di = -1; di <= 1; di++) {
-    for (let dj = -1; dj <= 1; dj++) {
-      if (di === 0 && dj === 0) continue;
-      const ni = i + di;
-      const nj = j + dj;
-      if (ni >= 0 && ni < state.height && nj >= 0 && nj < state.width) {
-        if (state.matrix[ni][nj].living) count++;
+  for (let rowOffset = -1; rowOffset <= 1; rowOffset++) {
+    for (let colOffset = -1; colOffset <= 1; colOffset++) {
+      if (rowOffset === 0 && colOffset === 0) continue;
+      const neighborRow = row + rowOffset;
+      const neighborCol = col + colOffset;
+      if (
+        neighborRow >= 0 &&
+        neighborRow < state.height &&
+        neighborCol >= 0 &&
+        neighborCol < state.width
+      ) {
+        if (state.matrix[neighborRow][neighborCol].living) count++;
       }
     }
   }
@@ -45,9 +50,9 @@ function getAliveAroundCount(i: number, j: number): number {
 }
 
 function calculateGeneration(): void {
-  state.matrix = state.matrix.map((row, i) =>
-    row.map((cell: Cell, j) => {
-      const n = getAliveAroundCount(i, j);
+  state.matrix = state.matrix.map((rowCells, row) =>
+    rowCells.map((cell: Cell, col) => {
+      const n = getAliveAroundCount(row, col);
       const willLive = cell.living ? n === 2 || n === 3 : n === 3;
       return {
         living: willLive,
@@ -86,169 +91,97 @@ function reset(): void {
   setIsRunning(false);
 }
 
+// Places a pattern string on the grid. '#' = alive cell, anything else = skip.
+// startRow/startCol define the top-left corner of the pattern bounding box.
+function placePattern(
+  pattern: string,
+  startRow: number,
+  startCol: number,
+  markHasLived = false,
+): void {
+  pattern
+    .trim()
+    .split("\n")
+    .forEach((line, rowOffset) => {
+      [...line].forEach((char, colOffset) => {
+        if (char !== "#") return;
+        const row = startRow + rowOffset;
+        const col = startCol + colOffset;
+        if (row >= 0 && row < state.height && col >= 0 && col < state.width) {
+          state.matrix[row][col].living = true;
+          if (markHasLived) state.matrix[row][col].hasLived = true;
+        }
+      });
+    });
+}
+
 function setPreset(preset: Preset): void {
   reset();
 
-  const fromTop = Math.floor(state.height / 4);
-  const fromLeft = Math.floor(state.width / 4);
+  const centerRow = Math.floor(state.height / 4);
+  const centerCol = Math.floor(state.width / 4);
 
   if (preset.id === 1) {
-    const positions = [
-      { col: fromTop, row: fromLeft },
-      { col: fromTop, row: fromLeft + 1 },
-      { col: fromTop, row: fromLeft + 2 },
-      { col: fromTop + 1, row: fromLeft + 2 },
-      { col: fromTop + 2, row: fromLeft + 1 },
+    // Two mirror shapes placed in a 2x2 arrangement around the center
+    const shapeA = `
+###
+..#
+.#.`.trim();
 
-      { col: fromTop, row: fromLeft + 5 },
-      { col: fromTop, row: fromLeft + 1 + 5 },
-      { col: fromTop, row: fromLeft + 2 + 5 },
-      { col: fromTop + 1, row: fromLeft + 2 + 5 },
-      { col: fromTop + 2, row: fromLeft + 1 + 5 },
+    const shapeB = `
+.#.
+#..
+###`.trim();
 
-      { col: fromTop + 5, row: fromLeft },
-      { col: fromTop + 5, row: fromLeft + 1 },
-      { col: fromTop + 5, row: fromLeft + 2 },
-      { col: fromTop + 1 + 5, row: fromLeft + 2 },
-      { col: fromTop + 2 + 5, row: fromLeft + 1 },
-
-      { col: fromTop + 5, row: fromLeft + 5 },
-      { col: fromTop + 5, row: fromLeft + 1 + 5 },
-      { col: fromTop + 5, row: fromLeft + 2 + 5 },
-      { col: fromTop + 1 + 5, row: fromLeft + 2 + 5 },
-      { col: fromTop + 2 + 5, row: fromLeft + 1 + 5 },
-
-      { col: fromTop, row: fromLeft - 5 },
-      { col: fromTop, row: fromLeft - 1 - 5 },
-      { col: fromTop, row: fromLeft - 2 - 5 },
-      { col: fromTop - 1, row: fromLeft - 2 - 5 },
-      { col: fromTop - 2, row: fromLeft - 1 - 5 },
-
-      { col: fromTop, row: fromLeft - 5 - 5 },
-      { col: fromTop, row: fromLeft - 1 - 5 - 5 },
-      { col: fromTop, row: fromLeft - 2 - 5 - 5 },
-      { col: fromTop - 1, row: fromLeft - 2 - 5 - 5 },
-      { col: fromTop - 2, row: fromLeft - 1 - 5 - 5 },
-
-      { col: fromTop + 5, row: fromLeft - 5 },
-      { col: fromTop + 5, row: fromLeft - 1 - 5 },
-      { col: fromTop + 5, row: fromLeft - 2 - 5 },
-      { col: fromTop - 1 + 5, row: fromLeft - 2 - 5 },
-      { col: fromTop - 2 + 5, row: fromLeft - 1 - 5 },
-
-      { col: fromTop + 5, row: fromLeft - 5 - 5 },
-      { col: fromTop + 5, row: fromLeft - 1 - 5 - 5 },
-      { col: fromTop + 5, row: fromLeft - 2 - 5 - 5 },
-      { col: fromTop - 1 + 5, row: fromLeft - 2 - 5 - 5 },
-      { col: fromTop - 2 + 5, row: fromLeft - 1 - 5 - 5 },
-    ];
-    positions.forEach(({ col, row }) => {
-      state.matrix[col][row].living = true;
-    });
+    placePattern(shapeA, centerRow,     centerCol     );
+    placePattern(shapeA, centerRow,     centerCol + 5 );
+    placePattern(shapeA, centerRow + 5, centerCol     );
+    placePattern(shapeA, centerRow + 5, centerCol + 5 );
+    placePattern(shapeB, centerRow - 2, centerCol - 7 );
+    placePattern(shapeB, centerRow - 2, centerCol - 12);
+    placePattern(shapeB, centerRow + 3, centerCol - 7 );
+    placePattern(shapeB, centerRow + 3, centerCol - 12);
   }
 
   if (preset.id === 2) {
-    const positions = [
-      { col: fromTop, row: fromLeft },
-      { col: fromTop, row: fromLeft + 1 },
-      { col: fromTop + 1, row: fromLeft + 1 },
-      { col: fromTop + 1, row: fromLeft },
-
-      { col: fromTop, row: fromLeft + 10 },
-      { col: fromTop + 1, row: fromLeft + 10 },
-      { col: fromTop + 2, row: fromLeft + 10 },
-
-      { col: fromTop - 1, row: fromLeft + 11 },
-      { col: fromTop + 3, row: fromLeft + 11 },
-
-      { col: fromTop - 2, row: fromLeft + 12 },
-      { col: fromTop + 4, row: fromLeft + 12 },
-      { col: fromTop - 2, row: fromLeft + 13 },
-      { col: fromTop + 4, row: fromLeft + 13 },
-
-      { col: fromTop + 1, row: fromLeft + 14 },
-
-      { col: fromTop - 1, row: fromLeft + 15 },
-      { col: fromTop + 3, row: fromLeft + 15 },
-
-      { col: fromTop, row: fromLeft + 16 },
-      { col: fromTop + 1, row: fromLeft + 16 },
-      { col: fromTop + 2, row: fromLeft + 16 },
-
-      { col: fromTop + 1, row: fromLeft + 17 },
-
-      { col: fromTop - 2, row: fromLeft + 20 },
-      { col: fromTop - 1, row: fromLeft + 20 },
-      { col: fromTop, row: fromLeft + 20 },
-
-      { col: fromTop - 2, row: fromLeft + 21 },
-      { col: fromTop - 1, row: fromLeft + 21 },
-      { col: fromTop, row: fromLeft + 21 },
-
-      { col: fromTop - 3, row: fromLeft + 22 },
-      { col: fromTop + 1, row: fromLeft + 22 },
-
-      { col: fromTop - 4, row: fromLeft + 24 },
-      { col: fromTop - 3, row: fromLeft + 24 },
-      { col: fromTop + 1, row: fromLeft + 24 },
-      { col: fromTop + 2, row: fromLeft + 24 },
-
-      { col: fromTop - 2, row: fromLeft + 34 },
-      { col: fromTop - 2, row: fromLeft + 35 },
-      { col: fromTop - 1, row: fromLeft + 34 },
-      { col: fromTop - 1, row: fromLeft + 35 },
-    ];
-    positions.forEach(({ col, row }) => {
-      state.matrix[col][row].living = true;
-    });
+    // Gosper Glider Gun — period-30 gun that emits a glider every 30 generations
+    placePattern(
+      `
+........................#...........
+......................#.#...........
+............##......##............##
+...........#...#....##............##
+##........#.....#...##..............
+##........#...#.##....#.#...........
+..........#.....#.......#...........
+...........#...#....................
+............##......................`.trim(),
+      centerRow - 4,
+      centerCol,
+    );
   }
 
   if (preset.id === 3) {
-    const positions = [
-      { col: fromTop - 1, row: fromLeft },
-      { col: fromTop + 1, row: fromLeft },
-
-      { col: fromTop, row: fromLeft + 2 },
-
-      { col: fromTop - 1, row: fromLeft + 3 },
-      { col: fromTop + 1, row: fromLeft + 3 },
-
-      { col: fromTop - 2, row: fromLeft + 4 },
-      { col: fromTop, row: fromLeft + 4 },
-      { col: fromTop + 2, row: fromLeft + 4 },
-
-      { col: fromTop - 2, row: fromLeft + 5 },
-      { col: fromTop - 1, row: fromLeft + 5 },
-      { col: fromTop + 1, row: fromLeft + 5 },
-
-      { col: fromTop - 2, row: fromLeft + 6 },
-      { col: fromTop - 1, row: fromLeft + 6 },
-      { col: fromTop + 1, row: fromLeft + 6 },
-
-      { col: fromTop - 2, row: fromLeft + 7 },
-      { col: fromTop, row: fromLeft + 7 },
-      { col: fromTop + 2, row: fromLeft + 7 },
-
-      { col: fromTop - 1, row: fromLeft + 8 },
-      { col: fromTop + 1, row: fromLeft + 8 },
-
-      { col: fromTop, row: fromLeft + 9 },
-
-      { col: fromTop - 1, row: fromLeft + 11 },
-      { col: fromTop + 1, row: fromLeft + 11 },
-    ];
-    positions.forEach(({ col, row }) => {
-      state.matrix[col][row].hasLived = true;
-      state.matrix[col][row].living = true;
-    });
+    // Vertically symmetric pattern
+    placePattern(
+      `
+....####....
+#..#.##.#..#
+..#.#..#.#..
+#..#.##.#..#
+....#..#....`.trim(),
+      centerRow - 2,
+      centerCol,
+      true,
+    );
   }
 
   if (preset.id === 4) {
-    for (let i = 0; i < state.matrix.length; i++) {
-      for (let j = 0; j < state.matrix[i].length; j++) {
+    for (let row = 0; row < state.matrix.length; row++) {
+      for (let col = 0; col < state.matrix[row].length; col++) {
         if (Math.floor(Math.random() * 9) === 1) {
-          state.matrix[i][j].hasLived = true;
-          state.matrix[i][j].living = true;
+          state.matrix[row][col].hasLived = true;
+          state.matrix[row][col].living = true;
         }
       }
     }
